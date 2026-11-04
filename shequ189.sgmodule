@@ -1,5 +1,5 @@
 #!name=天翼智慧社区 去广告
-#!desc=微信里打开的天翼智慧社区（w.shequ.189.cn）：清空首页轮播、弹窗、居家必备等广告位，隐藏顶部横幅，屏蔽 ux.21cn 统计（v1.0，Shadowrocket/Surge 版）
+#!desc=微信里打开的天翼智慧社区（w.shequ.189.cn）：清空首页轮播、弹窗、居家必备等广告位，隐藏顶部横幅、生活服务、社区精选、15分钟生活圈和底部「生活」「活动」tab，屏蔽 ux.21cn 统计（v1.1，Shadowrocket/Surge 版）
 #!author=liyouzi80
 #!system=ios
 #!date=2026-11-04
@@ -9,6 +9,7 @@ DOMAIN,ux.21cn.com,REJECT
 
 [Script]
 天翼社区-广告接口 = type=http-response,pattern=^https?://w\.shequ\.189\.cn/(.*/)?(wechat/ad/query|saas/all/ad/query|community-life-ad/(list|info)),requires-body=1,max-size=0,timeout=10,script-path=https://raw.githubusercontent.com/liyouzi80/taiyuangu-noad/main/scripts/shequ189_ad.js
+天翼社区-禁用缓存 = type=http-request,pattern=^https?://w\.shequ\.189\.cn/communityFw/h5/(index\.html)?(\?|$),timeout=10,script-path=https://raw.githubusercontent.com/liyouzi80/taiyuangu-noad/main/scripts/shequ189_ad.js
 天翼社区-隐藏横幅 = type=http-response,pattern=^https?://w\.shequ\.189\.cn/communityFw/h5/(index\.html)?(\?|$),requires-body=1,max-size=0,timeout=10,script-path=https://raw.githubusercontent.com/liyouzi80/taiyuangu-noad/main/scripts/shequ189_ad.js
 
 [MITM]
