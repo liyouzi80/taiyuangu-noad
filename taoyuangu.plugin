@@ -1,0 +1,46 @@
+#!name = 桃园谷 去广告
+#!desc = 屏蔽桃园谷广告位（含 getAppStAd）、穿山甲 SDK 与行为上报（v4.0）
+#!author = liyouzi80
+#!system = iOS,iPadOS
+#!date = 2026-10-26
+#!tag = 去广告,桃园谷
+
+# ---------------------------------------------------------------
+# v3.0 关键修复
+# 真实抓包里的路径是双斜杠：http://adfile.taoyuangu.com//adms/servlet/...
+#   v1 用 /+adms/ 能匹配；v2 写成 /(adms|...) 直接漏掉所有请求 → 广告全回来了
+# v3 统一用 /+(命名空间)/ 匹配，并覆盖 mms / cms / vdcs_hori / tsms / uums 等
+# ---------------------------------------------------------------
+
+[URL Rewrite]
+# 广告事件上报（逐帧曝光/点击上报，直接断）
+^https?://adfile\.taoyuangu\.com/+adms/servlet/reportThirdAppAdEventLog reject
+# 首页/开屏第三方广告位曝光上报
+^https?://adfile\.taoyuangu\.com/+adms/servlet/reportAppStAdServlet reject
+# 用户行为追踪上报
+^https?://sso\.taoyuangu\.com/+tygBigData/.* reject
+
+[Script]
+# 广告净化
+http-response ^https?://([a-z0-9-]+\.)*taoyuangu\.com(:\d+)?/+(adms|chims|cpsApi|uums|mms|cms|vdcs_hori|tsms|pms|dsms|ums|uoms|horiBigData|lxjsdkApi|jfmsApi|mapms-api|pds|facems|tygsvbs)(/|$) script-path=https://raw.githubusercontent.com/liyouzi80/taiyuangu-noad/main/scripts/taoyuangu_ad.js,requires-body=true,timeout=10,tag=桃园谷-广告净化,enable=true
+# 诊断日志：记录上面没覆盖到的 tyg 请求，用来找首页 banner / 福利社区的配置接口
+http-response ^https?://([a-z0-9-]+\.)*taoyuangu\.com(:\d+)?/+(?!.*(adms|chims|cpsApi|uums|mms|cms|vdcs_hori|tsms|pms|dsms|ums|uoms|horiBigData|lxjsdkApi|jfmsApi|mapms-api|pds|facems|tygsvbs)) script-path=https://raw.githubusercontent.com/liyouzi80/taiyuangu-noad/main/scripts/taoyuangu_diag.js,requires-body=false,tag=桃园谷-诊断,enable=true
+
+[Rule]
+# ===== 第三方广告 SDK（穿山甲等，域名级拦截）=====
+DOMAIN-SUFFIX,pangolin-sdk-toutiao.com,REJECT
+DOMAIN-SUFFIX,pangolin-sdk-toutiao-b.com,REJECT
+DOMAIN-SUFFIX,pglstatp-toutiao.com,REJECT
+DOMAIN-SUFFIX,ad.oceanengine.com,REJECT
+DOMAIN-SUFFIX,gdt.qq.com,REJECT
+DOMAIN-SUFFIX,e.qq.com,REJECT
+DOMAIN-SUFFIX,sigmob.cn,REJECT
+DOMAIN-SUFFIX,sigmob.com,REJECT
+DOMAIN-SUFFIX,mintegral.com,REJECT
+DOMAIN-SUFFIX,toponad.com,REJECT
+DOMAIN-SUFFIX,mobads.baidu.com,REJECT
+DOMAIN-SUFFIX,mobads-logs.baidu.com,REJECT
+# 白屏/启动异常时先把这段整段注释掉
+
+[MITM]
+hostname = *.taoyuangu.com, taoyuangu.com

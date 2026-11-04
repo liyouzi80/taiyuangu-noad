@@ -1,0 +1,31 @@
+#!name=桃园谷 去广告
+#!desc=屏蔽桃园谷广告位（含 getAppStAd）、穿山甲 SDK 与行为上报（v4.0，Shadowrocket/Surge 版）
+#!author=liyouzi80
+#!system=ios
+#!date=2026-10-26
+
+[Rule]
+DOMAIN-SUFFIX,pangolin-sdk-toutiao.com,REJECT
+DOMAIN-SUFFIX,pangolin-sdk-toutiao-b.com,REJECT
+DOMAIN-SUFFIX,pglstatp-toutiao.com,REJECT
+DOMAIN-SUFFIX,ad.oceanengine.com,REJECT
+DOMAIN-SUFFIX,gdt.qq.com,REJECT
+DOMAIN-SUFFIX,e.qq.com,REJECT
+DOMAIN-SUFFIX,sigmob.cn,REJECT
+DOMAIN-SUFFIX,sigmob.com,REJECT
+DOMAIN-SUFFIX,mintegral.com,REJECT
+DOMAIN-SUFFIX,toponad.com,REJECT
+DOMAIN-SUFFIX,mobads.baidu.com,REJECT
+DOMAIN-SUFFIX,mobads-logs.baidu.com,REJECT
+
+[URL Rewrite]
+^https?://adfile\.taoyuangu\.com/+adms/servlet/reportThirdAppAdEventLog - reject
+^https?://adfile\.taoyuangu\.com/+adms/servlet/reportAppStAdServlet - reject
+^https?://sso\.taoyuangu\.com/+tygBigData/.* - reject
+
+[Script]
+桃园谷-广告净化 = type=http-response,pattern=^https?://([a-z0-9-]+\.)*taoyuangu\.com(:\d+)?/+(adms|chims|cpsApi|uums|mms|cms|vdcs_hori|tsms|pms|dsms|ums|uoms|horiBigData|lxjsdkApi|jfmsApi|mapms-api|pds|facems|tygsvbs)(/|$),requires-body=1,max-size=0,timeout=10,script-path=https://raw.githubusercontent.com/liyouzi80/taiyuangu-noad/main/scripts/taoyuangu_ad.js
+桃园谷-诊断 = type=http-response,pattern=^https?://([a-z0-9-]+\.)*taoyuangu\.com(:\d+)?/+(?!.*(adms|chims|cpsApi|uums|mms|cms|vdcs_hori|tsms|pms|dsms|ums|uoms|horiBigData|lxjsdkApi|jfmsApi|mapms-api|pds|facems|tygsvbs)),requires-body=0,script-path=https://raw.githubusercontent.com/liyouzi80/taiyuangu-noad/main/scripts/taoyuangu_diag.js
+
+[MITM]
+hostname = %APPEND% *.taoyuangu.com, taoyuangu.com
