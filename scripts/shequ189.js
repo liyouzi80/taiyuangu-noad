@@ -1,5 +1,7 @@
 /**
- * 天翼智慧社区（w.shequ.189.cn，微信里打开的 H5）去广告 v1.3
+ * 天翼智慧社区（w.shequ.189.cn，微信里打开的 H5）去广告 v1.4
+ *
+ * v1.4：首页只保留「访客预约」「通行证」「全部」三个图标，其余卡片、提示条、编辑按钮全部隐藏
  *
  * v1.3：Loon 里脚本没命中 → 脚本改名（去掉 ?v=），匹配规则改成最简单的写法
  *
@@ -24,19 +26,64 @@
 var CSS_TEXT =
   // 首页顶部横幅
   ".owner-my-home .top-bg,#bannerList.banner-xz{display:none!important}" +
-  // 生活服务 / 社区精选（居家必备）/ 15分钟生活圈
+  // 首页：除两个图标宫格外，其余卡片全部隐藏（消息公告、小区慧眼、15分钟生活圈、生活服务、社区团购、社区精选……）
+  ".owner-my-home .container>:not(.menu-icon):not(.menu-list):not(.top-menu){display:none!important}" +
+  // 顶部红色提示条（认证房屋 / 未缴物业费）、「编辑」按钮
+  ".owner-my-home .header-tip,.owner-my-home .edit-btn{display:none!important}" +
+  // 其他页面里同类模块
   ".life-application,.shop-box,.life-circle{display:none!important}" +
   // 底部 tab：生活、活动；剩下的平分宽度
   ".nav-box a[href*=\"homeLife\"],.nav-box a[href*=\"homeActivity\"]{display:none!important}" +
   ".nav-box{display:flex!important}.nav-box>a.item,.nav-box>div{flex:1 1 0!important;width:auto!important}";
 
-var HIDE_CSS = "<style id=\"sq189-noad\">" + CSS_TEXT + "</style>";
+// 首页图标只保留这几个（按显示文字匹配）
+var KEEP_ICONS = ["访客预约", "通行证", "全部"];
 
-// 插到 JS 包开头：建一个 <style>，已有就跳过
+// 在页面里运行：监听 DOM 变化，把首页不在白名单里的图标藏掉
+function iconFilter(keep) {
+  if (window.__sq189Icons) return;
+  window.__sq189Icons = 1;
+  var ITEMS = [
+    [".owner-my-home .icon-item", ".ellipsis"],
+    [".owner-my-home .menu-cmp .menu-list", ".app-menu-txt"],
+    [".owner-my-home .main-p", null]
+  ];
+  var queued = false;
+  function run() {
+    queued = false;
+    for (var i = 0; i < ITEMS.length; i++) {
+      var els = document.querySelectorAll(ITEMS[i][0]);
+      for (var j = 0; j < els.length; j++) {
+        var el = els[j];
+        var lb = ITEMS[i][1] ? el.querySelector(ITEMS[i][1]) : null;
+        var t = ((lb || el).textContent || "").replace(/\s+/g, "");
+        if (!t) continue;
+        if (keep.indexOf(t) === -1) {
+          el.style.setProperty("display", "none", "important");
+          el.setAttribute("data-sq189", "1");
+        } else if (el.getAttribute("data-sq189")) {
+          el.style.removeProperty("display");
+          el.removeAttribute("data-sq189");
+        }
+      }
+    }
+  }
+  function schedule() { if (!queued) { queued = true; setTimeout(run, 0); } }
+  new MutationObserver(schedule).observe(document.documentElement, { childList: true, subtree: true, characterData: true });
+  schedule();
+}
+
+var FILTER_CALL = "(" + iconFilter.toString() + ")(" + JSON.stringify(KEEP_ICONS) + ");";
+
+var HIDE_CSS = "<style id=\"sq189-noad\">" + CSS_TEXT + "</style>" +
+  "<script>try{" + FILTER_CALL + "}catch(e){}</script>";
+
+// 插到 JS 包开头：建一个 <style>（已有就跳过）+ 图标过滤
 var JS_INJECT =
-  ";(function(){try{if(document.getElementById('sq189-noad'))return;" +
+  ";(function(){try{if(!document.getElementById('sq189-noad')){" +
   "var s=document.createElement('style');s.id='sq189-noad';s.textContent=" +
-  JSON.stringify(CSS_TEXT) + ";(document.head||document.documentElement).appendChild(s);}catch(e){}})();\n";
+  JSON.stringify(CSS_TEXT) + ";(document.head||document.documentElement).appendChild(s);}" +
+  FILTER_CALL + "}catch(e){}})();\n";
 
 var BUNDLE_RE = /\/communityFw\/h5\/app\.[0-9a-f]+\.js(\?|$)/;
 
