@@ -35,4 +35,23 @@
 
 ---
 
+# 天翼智慧社区 去广告（微信 H5）
+
+针对微信里打开的 `w.shequ.189.cn/communityFw/h5/`（「我的社区」页面）：
+
+- 清空首页顶部轮播、首页弹窗、「居家必备」、生活页、社区生活等广告位接口
+- 用 CSS 隐藏首页顶部横幅（广告接口为空时，页面会换成一张默认横幅）
+- 屏蔽 `ux.21cn.com` 页面埋点
+
+| 客户端 | 订阅地址 |
+|---|---|
+| Loon | `https://raw.githubusercontent.com/liyouzi80/taiyuangu-noad/main/shequ189.plugin` |
+| Shadowrocket / Surge | `https://raw.githubusercontent.com/liyouzi80/taiyuangu-noad/main/shequ189.sgmodule` |
+
+装好后同样要开启 MITM 并信任证书。然后在微信里**关掉这个页面重新打开**；如果横幅还在，到 微信 → 设置 → 通用 → 存储空间 清一下缓存。
+
+脚本：`scripts/shequ189_ad.js`。
+
+---
+
 仅供学习与技术研究使用。

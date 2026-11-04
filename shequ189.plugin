@@ -1,0 +1,17 @@
+#!name = 天翼智慧社区 去广告
+#!desc = 微信里打开的天翼智慧社区（w.shequ.189.cn）：清空首页轮播、弹窗、居家必备等广告位，隐藏顶部横幅，屏蔽 ux.21cn 统计（v1.0）
+#!author = liyouzi80
+#!system = iOS,iPadOS
+#!date = 2026-11-04
+#!tag = 去广告,天翼社区
+
+[Rule]
+# 页面埋点统计
+DOMAIN,ux.21cn.com,REJECT
+
+[Script]
+http-response ^https?://w\.shequ\.189\.cn/(.*/)?(wechat/ad/query|saas/all/ad/query|community-life-ad/(list|info)) script-path=https://raw.githubusercontent.com/liyouzi80/taiyuangu-noad/main/scripts/shequ189_ad.js,requires-body=true,timeout=10,tag=天翼社区-广告接口,enable=true
+http-response ^https?://w\.shequ\.189\.cn/communityFw/h5/(index\.html)?(\?|$) script-path=https://raw.githubusercontent.com/liyouzi80/taiyuangu-noad/main/scripts/shequ189_ad.js,requires-body=true,timeout=10,tag=天翼社区-隐藏横幅,enable=true
+
+[MITM]
+hostname = w.shequ.189.cn
