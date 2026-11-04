@@ -50,7 +50,7 @@
 | Loon | `https://raw.githubusercontent.com/liyouzi80/taiyuangu-noad/main/shequ189.plugin` |
 | Shadowrocket / Surge | `https://raw.githubusercontent.com/liyouzi80/taiyuangu-noad/main/shequ189.sgmodule` |
 
-装好后同样要开启 MITM 并信任证书。然后在微信里**关掉这个页面重新打开**；如果横幅还在，到 微信 → 设置 → 通用 → 存储空间 清一下缓存。
+装好后同样要开启 MITM 并信任证书（模块会追加 `w.shequ.189.cn`、`h5-shequ.dlife.cn` 两个主机名）。然后在微信里**关掉这个页面重新打开**；如果横幅还在，到 微信 → 设置 → 通用 → 存储空间 清一下缓存。
 
 脚本：`scripts/shequ189_ad.js`。
 
