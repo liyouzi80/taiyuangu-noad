@@ -1,5 +1,7 @@
 /**
- * 天翼智慧社区（w.shequ.189.cn，微信里打开的 H5）去广告 v1.4
+ * 天翼智慧社区（w.shequ.189.cn，微信里打开的 H5 + 小程序）去广告 v1.5
+ *
+ * v1.5：小程序（同一后台）——从菜单接口里删掉「小区慧眼」「生活圈」「我的投票」
  *
  * v1.4：首页只保留「访客预约」「通行证」「全部」三个图标，其余卡片、提示条、编辑按钮全部隐藏
  *
@@ -84,6 +86,33 @@ var JS_INJECT =
   "var s=document.createElement('style');s.id='sq189-noad';s.textContent=" +
   JSON.stringify(CSS_TEXT) + ";(document.head||document.documentElement).appendChild(s);}" +
   FILTER_CALL + "}catch(e){}})();\n";
+
+// 菜单接口里要删掉的功能（小程序界面改不了，只能从数据里删）
+var DROP_MENUS = ["小区慧眼", "生活圈", "15分钟生活圈", "我的投票", "投票"];
+var MENU_RE = /(menu|Menu|apps|Apps|layout|Layout)/;
+
+function dropMenus(node, depth) {
+  if (!node || typeof node !== "object" || depth > 8) return false;
+  var hit = false;
+  if (Array.isArray(node)) {
+    for (var i = node.length - 1; i >= 0; i--) {
+      var it = node[i];
+      if (it && typeof it === "object" && !Array.isArray(it)) {
+        var names = [it.name, it.showName, it.menuName, it.title, it.appName, it.moduleName];
+        var drop = false;
+        for (var j = 0; j < names.length; j++) {
+          if (typeof names[j] === "string" && DROP_MENUS.indexOf(names[j].replace(/\s+/g, "")) !== -1) { drop = true; break; }
+        }
+        if (drop) { node.splice(i, 1); hit = true; continue; }
+      }
+      if (dropMenus(it, depth + 1)) hit = true;
+    }
+  } else {
+    var ks = Object.keys(node);
+    for (var k = 0; k < ks.length; k++) if (dropMenus(node[ks[k]], depth + 1)) hit = true;
+  }
+  return hit;
+}
 
 var BUNDLE_RE = /\/communityFw\/h5\/app\.[0-9a-f]+\.js(\?|$)/;
 
@@ -174,6 +203,11 @@ var PAGE_RE = /\/communityFw\/h5\/(index\.html)?(\?|#|$)/;
       });
     }
     if (Array.isArray(obj.result)) { obj.result = []; changed = true; }
+  }
+
+  // 5) 菜单接口：删掉不要的功能入口
+  if (!changed && MENU_RE.test(url.split("?")[0])) {
+    if (dropMenus(obj, 0)) { changed = true; log("菜单已过滤"); }
   }
 
   if (changed) log("已清空");

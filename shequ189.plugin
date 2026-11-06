@@ -1,5 +1,5 @@
 #!name = 天翼智慧社区 去广告
-#!desc = 微信里打开的天翼智慧社区（w.shequ.189.cn）：清空广告接口；首页只保留「访客预约」「通行证」「全部」，底部去掉「生活」「活动」tab，屏蔽 ux.21cn 统计（v1.4）
+#!desc = 微信里打开的天翼智慧社区网页（w.shequ.189.cn）+ 小程序：清空广告接口；首页只保留「访客预约」「通行证」「全部」，底部去掉「生活」「活动」tab，小程序首页去掉小区慧眼、生活圈、我的投票；屏蔽 ux.21cn 统计（v1.5）
 #!author = liyouzi80
 #!system = iOS,iPadOS
 #!date = 2026-11-04
@@ -11,15 +11,17 @@ DOMAIN,ux.21cn.com,REJECT
 
 [Script]
 # 广告接口：清空返回的广告列表
-http-response ^https?:\/\/w\.shequ\.189\.cn\/.+\/wechat\/ad\/query script-path=https://raw.githubusercontent.com/liyouzi80/taiyuangu-noad/main/scripts/shequ189.js,requires-body=true,timeout=10,tag=天翼社区-首页轮播,enable=true
-http-response ^https?:\/\/w\.shequ\.189\.cn\/saas\/all\/ad\/query script-path=https://raw.githubusercontent.com/liyouzi80/taiyuangu-noad/main/scripts/shequ189.js,requires-body=true,timeout=10,tag=天翼社区-广告位,enable=true
-http-response ^https?:\/\/w\.shequ\.189\.cn\/.+\/community-life-ad\/(list|info) script-path=https://raw.githubusercontent.com/liyouzi80/taiyuangu-noad/main/scripts/shequ189.js,requires-body=true,timeout=10,tag=天翼社区-生活广告,enable=true
+http-response ^https?:\/\/w\.shequ\.189\.cn\/.+\/wechat\/ad\/query script-path=https://raw.githubusercontent.com/liyouzi80/taiyuangu-noad/main/scripts/shequ189-1.5.js,requires-body=true,timeout=10,tag=天翼社区-首页轮播,enable=true
+http-response ^https?:\/\/w\.shequ\.189\.cn\/saas\/all\/ad\/query script-path=https://raw.githubusercontent.com/liyouzi80/taiyuangu-noad/main/scripts/shequ189-1.5.js,requires-body=true,timeout=10,tag=天翼社区-广告位,enable=true
+http-response ^https?:\/\/w\.shequ\.189\.cn\/.+\/community-life-ad\/(list|info) script-path=https://raw.githubusercontent.com/liyouzi80/taiyuangu-noad/main/scripts/shequ189-1.5.js,requires-body=true,timeout=10,tag=天翼社区-生活广告,enable=true
+# 菜单接口（小程序/网页共用）：删掉小区慧眼、生活圈、我的投票
+http-response ^https?:\/\/w\.shequ\.189\.cn\/.*([mM]enu|[aA]pps|[lL]ayout) script-path=https://raw.githubusercontent.com/liyouzi80/taiyuangu-noad/main/scripts/shequ189-1.5.js,requires-body=true,timeout=10,tag=天翼社区-菜单过滤,enable=true
 # 页面：去掉缓存请求头，注入隐藏样式
-http-request ^https?:\/\/w\.shequ\.189\.cn\/communityFw\/h5\/index\.html script-path=https://raw.githubusercontent.com/liyouzi80/taiyuangu-noad/main/scripts/shequ189.js,timeout=10,tag=天翼社区-页面去缓存,enable=true
-http-response ^https?:\/\/w\.shequ\.189\.cn\/communityFw\/h5\/index\.html script-path=https://raw.githubusercontent.com/liyouzi80/taiyuangu-noad/main/scripts/shequ189.js,requires-body=true,timeout=10,tag=天翼社区-页面隐藏,enable=true
+http-request ^https?:\/\/w\.shequ\.189\.cn\/communityFw\/h5\/index\.html script-path=https://raw.githubusercontent.com/liyouzi80/taiyuangu-noad/main/scripts/shequ189-1.5.js,timeout=10,tag=天翼社区-页面去缓存,enable=true
+http-response ^https?:\/\/w\.shequ\.189\.cn\/communityFw\/h5\/index\.html script-path=https://raw.githubusercontent.com/liyouzi80/taiyuangu-noad/main/scripts/shequ189-1.5.js,requires-body=true,timeout=10,tag=天翼社区-页面隐藏,enable=true
 # JS 包：开头插入隐藏样式（第二条保险）
-http-request ^https?:\/\/h5-shequ\.dlife\.cn\/h5\/saas\/communityFw\/h5\/app\.[0-9a-f]+\.js script-path=https://raw.githubusercontent.com/liyouzi80/taiyuangu-noad/main/scripts/shequ189.js,timeout=10,tag=天翼社区-JS去缓存,enable=true
-http-response ^https?:\/\/h5-shequ\.dlife\.cn\/h5\/saas\/communityFw\/h5\/app\.[0-9a-f]+\.js script-path=https://raw.githubusercontent.com/liyouzi80/taiyuangu-noad/main/scripts/shequ189.js,requires-body=true,timeout=30,tag=天翼社区-JS隐藏,enable=true
+http-request ^https?:\/\/h5-shequ\.dlife\.cn\/h5\/saas\/communityFw\/h5\/app\.[0-9a-f]+\.js script-path=https://raw.githubusercontent.com/liyouzi80/taiyuangu-noad/main/scripts/shequ189-1.5.js,timeout=10,tag=天翼社区-JS去缓存,enable=true
+http-response ^https?:\/\/h5-shequ\.dlife\.cn\/h5\/saas\/communityFw\/h5\/app\.[0-9a-f]+\.js script-path=https://raw.githubusercontent.com/liyouzi80/taiyuangu-noad/main/scripts/shequ189-1.5.js,requires-body=true,timeout=30,tag=天翼社区-JS隐藏,enable=true
 
 [MITM]
 hostname = w.shequ.189.cn, h5-shequ.dlife.cn
